@@ -6,7 +6,8 @@
         <input type="text"
                matInput
                [formControl]="cityControl"
-               placeholder="City name">
+               placeholder="City name"
+               (keydown.enter)="searchWeather()">
       </mat-form-field>
       <button mat-raised-button color="primary" (click)="searchWeather()">Search</button>
     </div>

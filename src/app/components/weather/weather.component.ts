@@ -2,10 +2,8 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from '../../shared';
-import { ErrorHandlerService, WeatherService } from '../../services';
+import { WeatherService, ErrorHandlerService } from '../../services';
 import { getWeatherIcon } from '../../utils';
-import { MatSnackBar } from '@angular/material/snack-bar';
-
 
 
 @Component({
@@ -21,9 +19,8 @@ export class WeatherComponent {
   cityControl = new FormControl('');
   cityName: string = '';
 
-  private weatherService = inject(WeatherService);
-  private errorHandler = inject(ErrorHandlerService);
-  private snackBar = inject(MatSnackBar);
+private weatherService = inject(WeatherService);
+private errorHandler = inject(ErrorHandlerService);
 
   searchWeather() {
     const city = this.cityControl.value || '';
@@ -60,5 +57,4 @@ export class WeatherComponent {
   getWeatherIcon(iconCode: string): string {
     return getWeatherIcon(iconCode);
   }
-  
 }
