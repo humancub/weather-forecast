@@ -1,0 +1,33 @@
+<div class="container">
+  <mat-card>
+    <div class="container_search">
+      <mat-form-field appearance="fill">
+        <mat-label>Enter city name</mat-label>
+        <input type="text"
+               matInput
+               [formControl]="cityControl"
+               placeholder="City name">
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="searchWeather()">Search</button>
+    </div>
+
+    <div *ngIf="todayWeather" class="today-weather">
+      <h2>{{ cityName }}'s Weather</h2>
+      <p>Date: {{ todayWeather.dt_txt | date: 'mediumDate' }}</p>
+      <p>Temperature: {{ todayWeather.main.temp }} °C</p>
+      <mat-icon>{{ getWeatherIcon(todayWeather.weather[0].icon) }}</mat-icon>
+      <p>Description: {{ todayWeather.weather[0].description }}</p>
+    </div>
+
+    <div class="forecast_cards" *ngIf="weatherData.length">
+      <mat-card *ngFor="let forecast of weatherData">
+        <h3>{{ forecast.dt_txt | date: 'mediumDate' }}</h3>
+        <p>High: {{ forecast.main.temp_max }} °C</p>
+        <p>Low: {{ forecast.main.temp_min }} °C</p>
+        <mat-icon>{{ getWeatherIcon(forecast.weather[0].icon) }}</mat-icon>
+        <p>Description: {{ forecast.weather[0].description }}</p>
+      </mat-card>
+    </div>
+  </mat-card>
+</div>
+
