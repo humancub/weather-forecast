@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FavoriteCitiesService {
-
   private storageKey = 'favoriteCities';
 
   getFavoriteCities(): string[] {
@@ -22,7 +21,7 @@ export class FavoriteCitiesService {
 
   removeCity(city: string): void {
     let cities = this.getFavoriteCities();
-    cities = cities.filter(c => c !== city);
+    cities = cities.filter((c) => c !== city);
     localStorage.setItem(this.storageKey, JSON.stringify(cities));
   }
 

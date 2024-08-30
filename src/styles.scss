@@ -1,4 +1,58 @@
-/* You can add global styles to this file, and also import other style files */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #87ceeb, #f0f8ff);
+  overflow-x: hidden;
+}
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+@keyframes moveClouds {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.cloud {
+  position: absolute;
+  top: 20%;
+  width: 200px;
+  height: 100px;
+  background: white;
+  border-radius: 100px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  opacity: 0.8;
+  animation: moveClouds 20s linear infinite;
+}
+
+.cloud:nth-child(2) {
+  top: 40%;
+  width: 250px;
+  height: 120px;
+  animation: moveClouds 25s linear infinite;
+}
+
+.cloud:nth-child(3) {
+  top: 60%;
+  width: 300px;
+  height: 150px;
+  animation: moveClouds 30s linear infinite;
+}
+
+@media (max-width: 768px) {
+  .cloud {
+    width: 150px;
+    height: 75px;
+    animation-duration: 15s;
+  }
+}
+
+@media (max-width: 480px) {
+  .cloud {
+    width: 100px;
+    height: 50px;
+    animation-duration: 10s;
+  }
+}

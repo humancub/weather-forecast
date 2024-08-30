@@ -2,15 +2,14 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { AppConfig, APP_CONFIG } from '../app.config';
-import { ErrorHandlerService } from './error-handler.service';
-import { CacheService } from './cache.service';
+import { AppConfig, APP_CONFIG } from '../../app.config';
+import { ErrorHandlerService } from '..';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WeatherService {
-
   private apiUrl: string;
   private apiKey: string;
 
@@ -38,12 +37,16 @@ export class WeatherService {
         this.cacheService.setCache(cacheKey, data);
         return data;
       }),
-      catchError(error => {
+      catchError((error) => {
         this.errorHandler.handleError(error);
         throw error;
       })
     );
   }
+
+  getWeatherByCoords(lat: number, lon: number): Observable<any> {
+    return this.http.get<any>(
+      `${this.apiUrl}/forecast?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=metric`
+    );
+  }
 }
-
-

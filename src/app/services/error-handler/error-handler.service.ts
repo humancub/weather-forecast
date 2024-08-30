@@ -3,11 +3,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ErrorHandlerService {
-
-constructor(private snackBar: MatSnackBar) {}
+  constructor(private snackBar: MatSnackBar) {}
 
   handleError(error: HttpErrorResponse | Error): void {
     if (error instanceof HttpErrorResponse) {

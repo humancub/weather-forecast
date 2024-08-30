@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CacheService {
-
   private defaultCacheDuration = 3600000;
 
-  setCache(key: string, data: any, duration: number = this.defaultCacheDuration): void {
+  setCache(
+    key: string,
+    data: any,
+    duration: number = this.defaultCacheDuration
+  ): void {
     const expires = Date.now() + duration;
     const cacheData = { data, expires };
     localStorage.setItem(key, JSON.stringify(cacheData));

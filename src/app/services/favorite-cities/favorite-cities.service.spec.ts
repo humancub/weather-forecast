@@ -32,7 +32,7 @@ describe('FavoriteCitiesService', () => {
     service.addCity('New York');
     service.addCity('New York');
     const cities = service.getFavoriteCities();
-    expect(cities.length).toBe(1); 
+    expect(cities.length).toBe(1);
   });
 
   it('should remove a city from the favorites list', () => {

@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { CacheService } from './cache.service';
 
-
 describe('CacheService', () => {
   let service: CacheService;
 
@@ -31,34 +30,34 @@ describe('CacheService', () => {
     const key = 'testKey';
     const data = { value: 'testData' };
 
-    service.setCache(key, data, 100); 
+    service.setCache(key, data, 100);
 
     setTimeout(() => {
       const cachedData = service.getCache(key);
       expect(cachedData).toBeNull();
-      done(); 
-    }, 200); 
+      done();
+    }, 200);
   });
 
   it('should remove expired cache from localStorage', (done) => {
     const key = 'testKey';
     const data = { value: 'testData' };
 
-    service.setCache(key, data, 100); 
+    service.setCache(key, data, 100);
 
     setTimeout(() => {
-      service.getCache(key); 
+      service.getCache(key);
       const localStorageData = localStorage.getItem(key);
       expect(localStorageData).toBeNull();
       done();
-    }, 200); 
+    }, 200);
   });
 
   it('should clear specific cache', () => {
     const key = 'testKey';
     const data = { value: 'testData' };
 
-    service.setCache(key, data, 60000); 
+    service.setCache(key, data, 60000);
     service.clearCache(key);
     const cachedData = service.getCache(key);
     expect(cachedData).toBeNull();
@@ -69,7 +68,7 @@ describe('CacheService', () => {
     const key2 = 'testKey2';
     const data = { value: 'testData' };
 
-    service.setCache(key1, data, 60000); 
+    service.setCache(key1, data, 60000);
     service.setCache(key2, data, 60000);
     service.clearAllCache();
     const cachedData1 = service.getCache(key1);

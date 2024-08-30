@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FavoriteCitiesService } from '../../services/favorite-cities.service';
-import { WeatherService } from '../../services/weather.service';
+import { FavoriteCitiesService, WeatherService } from '../../services';
 import { getWeatherIcon } from '../../utils';
 import { SharedModule } from '../../shared';
 import { RouterModule } from '@angular/router';
@@ -11,7 +10,7 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, SharedModule, RouterModule],
   templateUrl: './favorite-cities.component.html',
-  styleUrls: ['./favorite-cities.component.scss']
+  styleUrls: ['./favorite-cities.component.scss'],
 })
 export class FavoriteCitiesComponent {
   favoriteCities: string[] = [];
@@ -30,8 +29,8 @@ export class FavoriteCitiesComponent {
   }
 
   loadWeatherData(): void {
-    this.favoriteCities.forEach(city => {
-      this.weatherService.getWeather(city).subscribe(data => {
+    this.favoriteCities.forEach((city) => {
+      this.weatherService.getWeather(city).subscribe((data) => {
         this.weatherData[city] = data.list[0];
       });
     });

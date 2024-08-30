@@ -1,7 +1,11 @@
 <mat-toolbar>
   <span>Weather Forecast</span>
   <span class="example-spacer"></span>
-  <button mat-icon-button class="example-icon favorite-icon" [routerLink]="['/favorites']">
+  <button
+    mat-icon-button
+    class="example-icon favorite-icon"
+    [routerLink]="['/favorites']"
+  >
     <mat-icon>favorite</mat-icon>
   </button>
 </mat-toolbar>
@@ -11,13 +15,17 @@
     <div class="container_search">
       <mat-form-field appearance="fill">
         <mat-label>Enter city name</mat-label>
-        <input type="text"
-               matInput
-               [formControl]="cityControl"
-               placeholder="City name"
-               (keydown.enter)="searchWeather()">
+        <input
+          type="text"
+          matInput
+          [formControl]="cityControl"
+          placeholder="City name"
+          (keydown.enter)="searchWeather()"
+        />
       </mat-form-field>
-      <button mat-raised-button color="primary" (click)="searchWeather()">Search</button>
+      <button mat-raised-button color="primary" (click)="searchWeather()">
+        Search
+      </button>
       <button mat-icon-button color="accent" (click)="addToFavorites()">
         <mat-icon>favorite</mat-icon>
       </button>
@@ -25,15 +33,16 @@
 
     <div *ngIf="todayWeather" class="today-weather">
       <h2>{{ cityName }}</h2>
-      <p>Date: {{ todayWeather.dt_txt | date: 'MMM d' }}</p>
+      <p>Date: {{ todayWeather.dt_txt | date : "MMM d" }}</p>
       <p>Temperature: {{ todayWeather.main.temp }} °C</p>
       <mat-icon>{{ getWeatherIcon(todayWeather.weather[0].icon) }}</mat-icon>
+      <p>Humidity: {{ todayWeather.main.humidity }}%</p>
       <p>Description: {{ todayWeather.weather[0].description }}</p>
     </div>
 
     <div class="forecast_cards" *ngIf="weatherData.length">
       <mat-card *ngFor="let forecast of weatherData">
-        <h3>{{ forecast.dt_txt | date: 'MMM d' }}</h3>
+        <h3>{{ forecast.dt_txt | date : "MMM d" }}</h3>
         <p>High: {{ forecast.main.temp_max }} °C</p>
         <p>Low: {{ forecast.main.temp_min }} °C</p>
         <mat-icon>{{ getWeatherIcon(forecast.weather[0].icon) }}</mat-icon>
@@ -42,5 +51,3 @@
     </div>
   </mat-card>
 </div>
-
-
