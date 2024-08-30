@@ -1,0 +1,27 @@
+<mat-toolbar>
+  <span>Weather Forecast</span>
+  <span class="example-spacer"></span>
+  <button mat-icon-button class="example-icon favorite-icon" [routerLink]="['/weather-forecast']">
+    <mat-icon>favorite</mat-icon>
+  </button>
+</mat-toolbar>
+
+<div class="container">
+    <mat-card>
+      <h2 class="header">Your Favorite Cities</h2>
+      <div class="forecast_cards" *ngIf="favoriteCities.length">
+        <mat-card *ngFor="let city of favoriteCities">
+          <h3>{{ city }}</h3>
+          <p *ngIf="weatherData[city]">
+            <strong>Temperature:</strong> {{ weatherData[city].main.temp }} °C
+          </p>
+          <mat-icon *ngIf="weatherData[city]">{{ getWeatherIcon(weatherData[city].weather[0].icon) }}</mat-icon>
+          <p *ngIf="weatherData[city]"><strong>Description:</strong> {{ weatherData[city].weather[0].description }}</p>
+          <button mat-icon-button color="warn" (click)="removeCity(city)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card>
+      </div>
+    </mat-card>
+  </div>
+  
