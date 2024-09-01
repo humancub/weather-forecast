@@ -1,53 +1,69 @@
-<mat-toolbar>
-  <span>Weather Forecast</span>
-  <span class="example-spacer"></span>
-  <button
-    mat-icon-button
-    class="example-icon favorite-icon"
-    [routerLink]="['/favorites']"
-  >
-    <mat-icon>favorite</mat-icon>
-  </button>
-</mat-toolbar>
+<div class="container-wrapper">
+  <app-toolbar
+    [buttonText]="'Favorite Cities'"
+    [routerLink]="'/favorites'"
+  ></app-toolbar>
 
-<div class="container">
-  <mat-card>
-    <div class="container_search">
-      <mat-form-field appearance="fill">
-        <mat-label>Enter city name</mat-label>
-        <input
-          type="text"
-          matInput
-          [formControl]="cityControl"
-          placeholder="City name"
-          (keydown.enter)="searchWeather()"
-        />
-      </mat-form-field>
-      <button mat-raised-button color="primary" (click)="searchWeather()">
-        Search
-      </button>
-      <button mat-icon-button color="accent" (click)="addToFavorites()">
-        <mat-icon>favorite</mat-icon>
-      </button>
-    </div>
+  <div class="container">
+    <mat-card class="main-card">
+      <div class="container_search">
+        <mat-form-field appearance="outline" class="input-field">
+          <mat-label>Enter city name</mat-label>
+          <input
+            type="text"
+            matInput
+            [formControl]="cityControl"
+            placeholder="City name"
+          />
+          <mat-error *ngIf="cityControl.hasError('required')">
+            City name is required
+          </mat-error>
+          <mat-error *ngIf="cityControl.hasError('nonEnglishLetters')">
+            Only English letters are allowed
+          </mat-error>
+        </mat-form-field>
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="searchWeather()"
+          [disabled]="cityControl.invalid"
+          class="search-button"
+        >
+          <mat-icon>search</mat-icon>
+        </button>
+      </div>
 
-    <div *ngIf="todayWeather" class="today-weather">
-      <h2>{{ cityName }}</h2>
-      <p>Date: {{ todayWeather.dt_txt | date : "MMM d" }}</p>
-      <p>Temperature: {{ todayWeather.main.temp }} °C</p>
-      <mat-icon>{{ getWeatherIcon(todayWeather.weather[0].icon) }}</mat-icon>
-      <p>Humidity: {{ todayWeather.main.humidity }}%</p>
-      <p>Description: {{ todayWeather.weather[0].description }}</p>
-    </div>
+      <div *ngIf="!todayWeather" class="placeholder-content">
+        <mat-icon>wb_sunny</mat-icon>
+        <h3>Enter a city name to see the weather forecast</h3>
+      </div>
 
-    <div class="forecast_cards" *ngIf="weatherData.length">
-      <mat-card *ngFor="let forecast of weatherData">
-        <h3>{{ forecast.dt_txt | date : "MMM d" }}</h3>
-        <p>High: {{ forecast.main.temp_max }} °C</p>
-        <p>Low: {{ forecast.main.temp_min }} °C</p>
-        <mat-icon>{{ getWeatherIcon(forecast.weather[0].icon) }}</mat-icon>
-        <p>Description: {{ forecast.weather[0].description }}</p>
-      </mat-card>
-    </div>
-  </mat-card>
+      <div *ngIf="todayWeather" class="today-weather">
+        <div class="city-header">
+          <h2>{{ cityName }}</h2>
+          <button mat-icon-button color="accent" (click)="toggleFavorite()">
+            <mat-icon>{{
+              isFavorite ? "favorite" : "favorite_border"
+            }}</mat-icon>
+          </button>
+        </div>
+        <p>Temperature: {{ todayWeather.main.temp | number : "1.0-0" }} °C</p>
+        <mat-icon>{{ getWeatherIcon(todayWeather.weather[0].icon) }}</mat-icon>
+        <p>Humidity: {{ todayWeather.main.humidity }}%</p>
+        <p>Description: {{ todayWeather.weather[0].description }}</p>
+      </div>
+
+      <div class="forecast_cards" *ngIf="weatherData.length">
+        <mat-card *ngFor="let forecast of weatherData">
+          <h3>{{ forecast.dt_txt | date : "MMM d" }}</h3>
+          <p>High: {{ forecast.main.temp_max | number : "1.0-0" }} °C</p>
+          <p>Low: {{ forecast.main.temp_min | number : "1.0-0" }} °C</p>
+          <p>
+            <mat-icon>{{ getWeatherIcon(forecast.weather[0].icon) }}</mat-icon>
+          </p>
+          <p>Description: {{ forecast.weather[0].description }}</p>
+        </mat-card>
+      </div>
+    </mat-card>
+  </div>
 </div>

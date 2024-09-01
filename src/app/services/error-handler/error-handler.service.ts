@@ -20,6 +20,20 @@ export class ErrorHandlerService {
     }
   }
 
+  handleGeolocationError(error: any): void {
+    if (error.code === 1) {
+      this.snackBar.open(
+        'Location access denied. Please enter a city manually.',
+        'Close',
+        {
+          duration: 5000,
+        }
+      );
+    } else {
+      this.handleError(new Error('Unable to retrieve your location.'));
+    }
+  }
+
   private showSnackBar(message: string): void {
     this.snackBar.open(message, 'Close', {
       duration: 3000,

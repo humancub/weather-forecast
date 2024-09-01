@@ -20,11 +20,14 @@ describe('ErrorHandlerService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should show a "City not found" message for a 404 error', () => {
+  it('should show "City not found" message for 404 error', () => {
     const spy = spyOn(snackBar, 'open');
-    const error = new HttpErrorResponse({ status: 404 });
+    const errorResponse = new HttpErrorResponse({
+      status: 404,
+      statusText: 'Not Found',
+    });
 
-    service.handleError(error);
+    service.handleError(errorResponse);
 
     expect(spy).toHaveBeenCalledWith(
       'City not found. Please enter a valid city name.',
@@ -33,11 +36,14 @@ describe('ErrorHandlerService', () => {
     );
   });
 
-  it('should show a "Failed to fetch weather data" message for other HTTP errors', () => {
+  it('should show "Failed to fetch weather data" message for non-404 HttpErrorResponse', () => {
     const spy = spyOn(snackBar, 'open');
-    const error = new HttpErrorResponse({ status: 500 });
+    const errorResponse = new HttpErrorResponse({
+      status: 500,
+      statusText: 'Internal Server Error',
+    });
 
-    service.handleError(error);
+    service.handleError(errorResponse);
 
     expect(spy).toHaveBeenCalledWith(
       'Failed to fetch weather data. Please try again.',
@@ -46,9 +52,9 @@ describe('ErrorHandlerService', () => {
     );
   });
 
-  it('should show an "Unexpected error occurred" message for non-HTTP errors', () => {
+  it('should show "An unexpected error occurred" message for general errors', () => {
     const spy = spyOn(snackBar, 'open');
-    const error = new Error('Some non-HTTP error');
+    const error = new Error('Unexpected error');
 
     service.handleError(error);
 

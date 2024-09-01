@@ -1,18 +1,25 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { SharedModule } from '../../shared';
+import {
+  englishLettersValidator,
+  SharedModule,
+  ToolbarComponent,
+} from '../../shared';
 import {
   WeatherService,
   ErrorHandlerService,
   FavoriteCitiesService,
   GeolocationService,
+  CacheService,
 } from '../../services';
 import { getWeatherIcon } from '../../utils';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterModule } from '@angular/router';
+import { catchError, of, switchMap } from 'rxjs';
+import { WeatherData, WeatherResponse } from '../../models';
 
 @Component({
   selector: 'app-weather',
@@ -24,78 +31,112 @@ import { RouterModule } from '@angular/router';
     MatIconModule,
     SharedModule,
     RouterModule,
+    ToolbarComponent,
   ],
   templateUrl: './weather.component.html',
   styleUrls: ['./weather.component.scss'],
 })
 export class WeatherComponent implements OnInit {
-  weatherData: any[] = [];
-  todayWeather: any = null;
-  cityControl = new FormControl('');
-  cityName: string = '';
+  public weatherData: WeatherData[] = [];
+  public todayWeather: WeatherData | null = null;
+  public cityControl = new FormControl('', [
+    Validators.required,
+    englishLettersValidator(),
+  ]);
+  public cityName: string = '';
+  public isFavorite: boolean = false;
+  public isLoading: boolean = false;
 
   private weatherService = inject(WeatherService);
   private errorHandler = inject(ErrorHandlerService);
   private favoriteCitiesService = inject(FavoriteCitiesService);
   private geolocationService = inject(GeolocationService);
+  private cacheService = inject(CacheService);
   private snackBar = inject(MatSnackBar);
 
+  private cacheDuration = 3600000;
+
   ngOnInit() {
-    this.getCurrentLocationWeather();
+    this.loadInitialWeatherData();
   }
 
-  getCurrentLocationWeather() {
-    this.geolocationService.getUserLocation().subscribe({
-      next: (position) => {
-        console.log('Geolocation success:', position);
-        const { latitude, longitude } = position.coords;
-        this.weatherService.getWeatherByCoords(latitude, longitude).subscribe({
-          next: (data: any) => {
-            console.log('Weather data by coords:', data);
-            this.cityName = data.city.name;
-            this.weatherData = this.getFiveDayForecast(data.list);
-            this.todayWeather = data.list[0];
+  private loadInitialWeatherData(): void {
+    const lastCity = this.cacheService.getCache<string>('lastCity');
+
+    if (lastCity) {
+      this.searchWeatherByCity(lastCity);
+    } else {
+      this.isLoading = true;
+      this.geolocationService
+        .getUserLocation()
+        .pipe(
+          switchMap((position) => {
+            const { latitude, longitude } = position.coords;
+            return this.weatherService.getWeatherByCoords(latitude, longitude);
+          }),
+          catchError((error) => {
+            this.errorHandler.handleGeolocationError(error); 
+            return of(null);
+          })
+        )
+        .subscribe({
+          next: (data: WeatherResponse | null) => {
+            if (data) {
+              this.processWeatherData(data);
+            }
           },
-          error: (error: any) => {
-            console.error('Weather API error:', error);
-            this.errorHandler.handleError(error);
-          },
+          complete: () => (this.isLoading = false),
         });
-      },
-      error: (error) => {
-        console.error('Geolocation error:', error);
-        this.errorHandler.handleError(
-          new Error('Unable to retrieve your location.')
-        );
-      },
-    });
-  }
-
-  searchWeather() {
-    const city = this.cityControl.value || '';
-
-    if (city) {
-      this.weatherService.getWeather(city).subscribe({
-        next: (data: any) => {
-          console.log('Weather data by city:', data);
-          this.cityName = data.city.name;
-          this.weatherData = this.getFiveDayForecast(data.list);
-          this.todayWeather = data.list[0];
-        },
-        error: (error: any) => {
-          console.error('Weather API error:', error);
-          this.errorHandler.handleError(error);
-        },
-      });
-    } else {
-      this.errorHandler.handleError(new Error('Please enter a city name.'));
     }
   }
 
-  addToFavorites() {
-    if (this.cityName) {
-      this.favoriteCitiesService.addCity(this.cityName);
-      this.snackBar.open(`${this.cityName} added to favorites`, 'Close', {
+  searchWeather(): void {
+    if (this.cityControl.invalid) return;
+
+    const city = this.cityControl.value!;
+    this.searchWeatherByCity(city);
+  }
+
+  private searchWeatherByCity(city: string): void {
+    this.isLoading = true;
+
+    const cachedWeather = this.cacheService.getCache<WeatherResponse>(
+      `weather_${city}`
+    );
+
+    if (cachedWeather) {
+      this.processWeatherData(cachedWeather);
+      this.isLoading = false;
+    } else {
+      this.weatherService
+        .getWeather(city)
+        .pipe(
+          catchError((error) => {
+            this.errorHandler.handleError(error);
+            return of(null);
+          })
+        )
+        .subscribe({
+          next: (data: WeatherResponse | null) => {
+            if (data) {
+              this.processWeatherData(data);
+              this.cityControl.reset();
+              this.cacheService.setCache(
+                `weather_${city}`,
+                data,
+                this.cacheDuration
+              );
+            }
+          },
+          complete: () => (this.isLoading = false),
+        });
+    }
+  }
+
+  toggleFavorite(): void {
+    if (this.isFavorite) {
+      this.favoriteCitiesService.removeCity(this.cityName);
+      this.snackBar.open(`${this.cityName} removed from favorites`, 'Close', {
         duration: 3000,
       });
     } else {
@@ -104,10 +145,19 @@ export class WeatherComponent implements OnInit {
         duration: 3000,
       });
     }
+    this.isFavorite = !this.isFavorite;
   }
 
-  getFiveDayForecast(list: any[]) {
-    const forecastMap = new Map();
+  private processWeatherData(data: WeatherResponse): void {
+    this.cityName = data.city.name;
+    this.weatherData = this.getFiveDayForecast(data.list);
+    this.todayWeather = data.list[0];
+    this.isFavorite = this.favoriteCitiesService.isCityFavorite(this.cityName);
+    this.cacheService.setCache('lastCity', this.cityName);
+  }
+
+  private getFiveDayForecast(list: WeatherData[]): WeatherData[] {
+    const forecastMap = new Map<string, WeatherData>();
 
     list.forEach((item) => {
       const date = new Date(item.dt_txt).toLocaleDateString();
@@ -116,11 +166,11 @@ export class WeatherComponent implements OnInit {
       }
     });
 
-    const forecast = Array.from(forecastMap.values()).slice(1, 6);
-    return forecast;
+    return Array.from(forecastMap.values()).slice(1, 6);
   }
 
   getWeatherIcon(iconCode: string): string {
     return getWeatherIcon(iconCode);
   }
 }
+

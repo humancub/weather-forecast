@@ -7,6 +7,7 @@ describe('CacheService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(CacheService);
+    localStorage.clear();
   });
 
   afterEach(() => {
@@ -17,63 +18,46 @@ describe('CacheService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should cache data and retrieve it before expiration', () => {
+  it('should set and retrieve cached data', () => {
     const key = 'testKey';
-    const data = { value: 'testData' };
+    const data = { name: 'test' };
+    service.setCache(key, data);
 
-    service.setCache(key, data, 60000);
-    const cachedData = service.getCache(key);
-    expect(cachedData).toEqual(data);
+    const result = service.getCache(key);
+    expect(result).toEqual(data);
   });
 
-  it('should return null if cache is expired', (done) => {
+  it('should return null if cache is expired', () => {
     const key = 'testKey';
-    const data = { value: 'testData' };
+    const data = { name: 'test' };
+    service.setCache(key, data, -1000);
 
-    service.setCache(key, data, 100);
-
-    setTimeout(() => {
-      const cachedData = service.getCache(key);
-      expect(cachedData).toBeNull();
-      done();
-    }, 200);
+    const result = service.getCache(key);
+    expect(result).toBeNull();
   });
 
-  it('should remove expired cache from localStorage', (done) => {
+  it('should remove cache item', () => {
     const key = 'testKey';
-    const data = { value: 'testData' };
+    const data = { name: 'test' };
+    service.setCache(key, data);
 
-    service.setCache(key, data, 100);
-
-    setTimeout(() => {
-      service.getCache(key);
-      const localStorageData = localStorage.getItem(key);
-      expect(localStorageData).toBeNull();
-      done();
-    }, 200);
-  });
-
-  it('should clear specific cache', () => {
-    const key = 'testKey';
-    const data = { value: 'testData' };
-
-    service.setCache(key, data, 60000);
     service.clearCache(key);
-    const cachedData = service.getCache(key);
-    expect(cachedData).toBeNull();
+    const result = service.getCache(key);
+    expect(result).toBeNull();
   });
 
-  it('should clear all cache', () => {
+  it('should clear all cache items', () => {
     const key1 = 'testKey1';
     const key2 = 'testKey2';
-    const data = { value: 'testData' };
+    const data1 = { name: 'test1' };
+    const data2 = { name: 'test2' };
 
-    service.setCache(key1, data, 60000);
-    service.setCache(key2, data, 60000);
+    service.setCache(key1, data1);
+    service.setCache(key2, data2);
+
     service.clearAllCache();
-    const cachedData1 = service.getCache(key1);
-    const cachedData2 = service.getCache(key2);
-    expect(cachedData1).toBeNull();
-    expect(cachedData2).toBeNull();
+
+    expect(service.getCache(key1)).toBeNull();
+    expect(service.getCache(key2)).toBeNull();
   });
 });

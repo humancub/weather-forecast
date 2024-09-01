@@ -7,9 +7,7 @@ describe('FavoriteCitiesService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(FavoriteCitiesService);
-  });
 
-  afterEach(() => {
     localStorage.clear();
   });
 
@@ -17,38 +15,70 @@ describe('FavoriteCitiesService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should return an empty list if no cities are saved', () => {
-    const cities = service.getFavoriteCities();
-    expect(cities).toEqual([]);
+  it('should return an empty array if no favorite cities are stored', () => {
+    expect(service.getFavoriteCities()).toEqual([]);
   });
 
-  it('should add a city to the favorites list', () => {
-    service.addCity('New York');
-    const cities = service.getFavoriteCities();
-    expect(cities).toContain('New York');
+  it('should return stored favorite cities', () => {
+    const cities = ['City1', 'City2'];
+    localStorage.setItem('favoriteCities', JSON.stringify(cities));
+    expect(service.getFavoriteCities()).toEqual(cities);
   });
 
-  it('should not add the same city more than once', () => {
-    service.addCity('New York');
-    service.addCity('New York');
-    const cities = service.getFavoriteCities();
-    expect(cities.length).toBe(1);
+  it('should add a city to favorite cities', () => {
+    service.addCity('City1');
+    expect(service.getFavoriteCities()).toEqual(['City1']);
   });
 
-  it('should remove a city from the favorites list', () => {
-    service.addCity('New York');
-    service.addCity('Los Angeles');
-    service.removeCity('New York');
-    const cities = service.getFavoriteCities();
-    expect(cities).not.toContain('New York');
-    expect(cities).toContain('Los Angeles');
+  it('should not add a city if it already exists in favorite cities', () => {
+    service.addCity('City1');
+    service.addCity('City1');
+    expect(service.getFavoriteCities()).toEqual(['City1']);
+  });
+
+  it('should remove a city from favorite cities', () => {
+    service.addCity('City1');
+    service.addCity('City2');
+    service.removeCity('City1');
+    expect(service.getFavoriteCities()).toEqual(['City2']);
   });
 
   it('should clear all favorite cities', () => {
-    service.addCity('New York');
-    service.addCity('Los Angeles');
+    service.addCity('City1');
+    service.addCity('City2');
     service.clearFavoriteCities();
-    const cities = service.getFavoriteCities();
-    expect(cities).toEqual([]);
+    expect(service.getFavoriteCities()).toEqual([]);
+  });
+
+  it('should emit favorite cities when a city is added', () => {
+    const spy = jasmine.createSpy('favoriteCitiesObserver');
+    service.getFavoriteCities$().subscribe(spy);
+
+    service.addCity('City1');
+    expect(spy).toHaveBeenCalledWith(['City1']);
+  });
+
+  it('should emit favorite cities when a city is removed', () => {
+    const spy = jasmine.createSpy('favoriteCitiesObserver');
+    service.addCity('City1');
+    service.getFavoriteCities$().subscribe(spy);
+
+    service.removeCity('City1');
+    expect(spy).toHaveBeenCalledWith([]);
+  });
+
+  it('should emit empty array when favorite cities are cleared', () => {
+    const spy = jasmine.createSpy('favoriteCitiesObserver');
+    service.addCity('City1');
+    service.getFavoriteCities$().subscribe(spy);
+
+    service.clearFavoriteCities();
+    expect(spy).toHaveBeenCalledWith([]);
+  });
+
+  it('should correctly check if a city is favorite', () => {
+    service.addCity('City1');
+    expect(service.isCityFavorite('City1')).toBeTrue();
+    expect(service.isCityFavorite('City2')).toBeFalse();
   });
 });

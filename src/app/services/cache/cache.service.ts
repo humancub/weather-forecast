@@ -6,23 +6,23 @@ import { Injectable } from '@angular/core';
 export class CacheService {
   private defaultCacheDuration = 3600000;
 
-  setCache(
+  setCache<T>(
     key: string,
-    data: any,
+    data: T,
     duration: number = this.defaultCacheDuration
   ): void {
     const expires = Date.now() + duration;
-    const cacheData = { data, expires };
+    const cacheData: CacheData<T> = { data, expires };
     localStorage.setItem(key, JSON.stringify(cacheData));
   }
 
-  getCache(key: string): any | null {
+  getCache<T>(key: string): T | null {
     const cacheData = localStorage.getItem(key);
     if (!cacheData) {
       return null;
     }
 
-    const parsedData = JSON.parse(cacheData);
+    const parsedData: CacheData<T> = JSON.parse(cacheData);
     if (Date.now() > parsedData.expires) {
       localStorage.removeItem(key);
       return null;
@@ -38,4 +38,9 @@ export class CacheService {
   clearAllCache(): void {
     localStorage.clear();
   }
+}
+
+interface CacheData<T> {
+  data: T;
+  expires: number;
 }

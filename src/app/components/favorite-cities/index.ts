@@ -1,1 +1,1 @@
-export * from './favorite-cities.component'
+export * from './favorite-cities.component';
