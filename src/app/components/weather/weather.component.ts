@@ -75,7 +75,7 @@ export class WeatherComponent implements OnInit {
             return this.weatherService.getWeatherByCoords(latitude, longitude);
           }),
           catchError((error) => {
-            this.errorHandler.handleGeolocationError(error); 
+            this.errorHandler.handleGeolocationError(error);
             return of(null);
           })
         )
@@ -173,4 +173,3 @@ export class WeatherComponent implements OnInit {
     return getWeatherIcon(iconCode);
   }
 }
-
