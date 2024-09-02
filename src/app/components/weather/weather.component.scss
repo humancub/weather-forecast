@@ -1,0 +1,137 @@
+@import "../../../styles.scss";
+
+.container-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.toolbar-wrapper {
+  flex-shrink: 0;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.main-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-width: 500px;
+  min-height: 400px;
+}
+
+.container_search {
+  display: flex;
+  align-items: center;
+}
+
+.input-field {
+  width: 100%;
+  max-width: 400px;
+  min-width: 300px;
+  margin-right: 8px;
+}
+
+.search-button {
+  margin-bottom: 16px;
+}
+
+.placeholder-content {
+  text-align: center;
+  color: #757575;
+  margin-top: 40px;
+}
+
+.placeholder-content mat-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.today-weather {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.forecast_cards {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.forecast_cards mat-card {
+  flex: 1 1 calc(20% - 10px);
+  min-width: 150px;
+  text-align: center;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.city-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.city-header h2 {
+  margin: 0;
+}
+
+@media (max-width: 1200px) {
+  .forecast_cards mat-card {
+    flex: 1 1 calc(25% - 10px);
+  }
+}
+
+@media (max-width: 992px) {
+  .forecast_cards mat-card {
+    flex: 1 1 calc(33.3% - 10px);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    height: auto;
+  }
+  .input-field {
+    max-width: 50%;
+  }
+
+  .forecast_cards mat-card {
+    flex: 1 1 calc(50% - 10px);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+    padding-top: 60px;
+    padding-bottom: 20px;
+  }
+  .main-card {
+    min-width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .input-field {
+    max-width: 20%;
+  }
+
+  .forecast_cards mat-card {
+    flex: 1 1 calc(100% - 10px);
+  }
+}
