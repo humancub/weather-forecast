@@ -1,10 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { WeatherService } from './weather.service';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController } from '@angular/common/http/testing';
 import { ErrorHandlerService } from '..';
 import { CacheService } from '../cache/cache.service';
 import { APP_CONFIG } from '../../app.config';
-import { of, throwError } from 'rxjs';
 
 describe('WeatherService', () => {
   let service: WeatherService;
@@ -22,7 +21,6 @@ describe('WeatherService', () => {
     const errorHandlerSpy = jasmine.createSpyObj('ErrorHandlerService', ['handleError']);
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
         WeatherService,
         { provide: APP_CONFIG, useValue: mockConfig },
