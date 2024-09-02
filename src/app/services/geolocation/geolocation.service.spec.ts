@@ -13,8 +13,6 @@ describe('GeolocationService', () => {
     expect(service).toBeTruthy();
   });
 
-
-
   it('should return an error when geolocation is not available', (done) => {
     Object.defineProperty(navigator, 'geolocation', {
       value: undefined,
